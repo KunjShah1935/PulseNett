@@ -1352,7 +1352,7 @@
         function hideErr(id) { const el = document.getElementById(id); if (el) el.classList.remove('show'); }
         function setErr(id, hasErr) { const inp = document.getElementById(id); if (inp) inp.classList.toggle('error', hasErr); }
 
-        const API = "https://pulsenett.onrender.com";
+        
 
         async function handleSignup() {
             let valid = true;
@@ -1370,7 +1370,7 @@
             }
 
             try {
-                const res = await fetch(`${API}/api/signup`, {
+                const res = await fetch("https://pulsenett.onrender.com/api/signup", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -1413,7 +1413,7 @@
             }
 
             try {
-                const res = await fetch(`${API}/api/login`, {
+                const res = await fetch("https://pulsenett.onrender.com/api/login", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -1444,3 +1444,4 @@
 </body>
 
 </html>
+
