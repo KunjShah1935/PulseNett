@@ -24,7 +24,10 @@ dotenv.config();
 const app = express();
 
 // middleware
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5173", "https://pulse-nett-lipa.vercel.app", /\.vercel\.app$/],
+  credentials: true
+}));
 app.use(express.json());
 
 // test route
