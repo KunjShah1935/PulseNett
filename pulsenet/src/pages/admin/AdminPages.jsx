@@ -380,7 +380,7 @@ export function PatientManagement() {
   useEffect(() => {
     Promise.all([
       fetch(`${BASE}/api/admission-form`).then(res => res.json()),
-      fetch(`${BASE}/api/doctors`).then(res => res.json()),
+      fetch(`${BASE}/api/staff`).then(res => res.json()).then(data => (Array.isArray(data) ? data : []).filter(u => u.role === 'doctor')),
       fetch(`${BASE}/api/rooms`).then(res => res.json())
     ])
     .then(([forms, doctors, rooms]) => {
