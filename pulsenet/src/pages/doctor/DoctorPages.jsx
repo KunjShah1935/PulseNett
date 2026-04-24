@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import BASE from '../../config';
-import { StatCard, Card, Table, Badge, SectionHeader } from '../../components/ui';
+import { Card, Table, SectionHeader } from '../../components/ui';
 
+/* ================= Dashboard ================= */
 export function DoctorDashboard() {
   const [patients, setPatients] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
@@ -14,11 +15,13 @@ export function DoctorDashboard() {
 
     fetch(`${BASE}/api/admission/doctor/${doctorId}`)
       .then(res => res.json())
-      .then(setPatients);
+      .then(setPatients)
+      .catch(err => console.error("Patients fetch error:", err));
 
     fetch(`${BASE}/api/medication/doctor/${doctorId}`)
       .then(res => res.json())
-      .then(setPrescriptions);
+      .then(setPrescriptions)
+      .catch(err => console.error("Prescriptions fetch error:", err));
 
   }, [doctorId]);
 
@@ -36,6 +39,30 @@ export function DoctorDashboard() {
             </tr>
           ))}
         </Table>
+      </Card>
+    </div>
+  );
+}
+
+/* ================= Patients Page ================= */
+export function DoctorPatients() {
+  return (
+    <div>
+      <SectionHeader title="Doctor Patients" />
+      <Card>
+        <p className="p-4">Patients page working ✅</p>
+      </Card>
+    </div>
+  );
+}
+
+/* ================= Prescriptions Page ================= */
+export function DoctorPrescriptions() {
+  return (
+    <div>
+      <SectionHeader title="Doctor Prescriptions" />
+      <Card>
+        <p className="p-4">Prescriptions page working ✅</p>
       </Card>
     </div>
   );

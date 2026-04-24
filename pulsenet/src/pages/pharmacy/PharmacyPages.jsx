@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import BASE from '../../config';
-import { StatCard, Card, Table, Badge, SectionHeader } from '../../components/ui';
+import { Card, Table, SectionHeader, Badge } from '../../components/ui';
 
+/* ================= Dashboard ================= */
 export function PharmacyDashboard() {
   const [meds, setMeds] = useState([]);
 
   useEffect(() => {
     fetch(`${BASE}/api/medication/all`)
       .then(r => r.json())
-      .then(setMeds);
+      .then(setMeds)
+      .catch(err => console.error("Meds fetch error:", err));
   }, []);
 
   return (
@@ -25,6 +27,42 @@ export function PharmacyDashboard() {
             </tr>
           ))}
         </Table>
+      </Card>
+    </div>
+  );
+}
+
+/* ================= Prescriptions ================= */
+export function PharmacyPrescriptions() {
+  return (
+    <div>
+      <SectionHeader title="Pharmacy Prescriptions" />
+      <Card>
+        <p className="p-4">Prescriptions page working ✅</p>
+      </Card>
+    </div>
+  );
+}
+
+/* ================= Inventory ================= */
+export function MedicineInventory() {
+  return (
+    <div>
+      <SectionHeader title="Medicine Inventory" />
+      <Card>
+        <p className="p-4">Inventory page working ✅</p>
+      </Card>
+    </div>
+  );
+}
+
+/* ================= Billing ================= */
+export function PharmacyBilling() {
+  return (
+    <div>
+      <SectionHeader title="Pharmacy Billing" />
+      <Card>
+        <p className="p-4">Billing page working ✅</p>
       </Card>
     </div>
   );
