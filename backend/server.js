@@ -44,6 +44,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 app.use("/api", adminRoutes);
+app.use("/api", authRoutes);
 app.use("/api/auth", authRoutes);
 
 app.use("/api/patient", patientRoutes);
