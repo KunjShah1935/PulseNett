@@ -570,16 +570,62 @@ export function PatientManagement() {
 
 export function RoomManagement() {
   const [rooms, setRooms] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [newRoom, setNewRoom] = useState({ number: "", type: "General Ward", beds: 1 });
 
   useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const fetchRooms = () => {
     fetch(`${BASE}/api/rooms`)
       .then(res => res.json())
       .then(setRooms)
       .catch(err => console.error("Rooms fetch error:", err));
-  }, []);
+  };
+
+  const handleAddRoom = async (e) => {
+    e.preventDefault();
+    if (!newRoom.number || !newRoom.beds) {
+      alert("Please fill all fields ❌");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${BASE}/api/rooms/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          number: newRoom.number,
+          type: newRoom.type,
+          beds: parseInt(newRoom.beds)
+        })
+      });
+
+      if (res.ok) {
+        alert("Room added successfully! ✅");
+        setShowModal(false);
+        setNewRoom({ number: "", type: "General Ward", beds: 1 });
+        fetchRooms();
+      } else {
+        alert("Failed to add room ❌");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error adding room ❌");
+    }
+  };
+
   return (
     <div>
-      <SectionHeader title="Room Management" />
+      <SectionHeader 
+        title="Room Management" 
+        action={
+          <button className="btn-primary" onClick={() => setShowModal(true)}>
+            + Add Room
+          </button>
+        }
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
         {rooms?.filter(Boolean).map(r => {
           const status = (r?.occupied ?? 0) >= (r?.beds ?? 0) ? "Full" : "Available";
@@ -598,7 +644,7 @@ export function RoomManagement() {
                 </Badge>
               </div>
 
-              <div className="h-2 rounded-full bg-slate-100 mb-3 overflow-hidden">
+              <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-700 mb-3 overflow-hidden">
                 <div
                   className={`h-full ${status === 'Full' ? 'bg-rose-400' : 'bg-emerald-400'}`}
                   style={{
@@ -618,7 +664,81 @@ export function RoomManagement() {
             </Card>
           );
         })}
+
+        {rooms.length === 0 && (
+          <div className="col-span-full">
+            <Card>
+              <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm">
+                No rooms registered in the database. Click "+ Add Room" to create one.
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md shadow-lg border border-slate-100 dark:border-slate-700">
+            <h2 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white">Add New Room</h2>
+            
+            <form onSubmit={handleAddRoom} className="flex flex-col gap-4">
+              <div>
+                <label className="form-label">Room Number</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 101, 204"
+                  className="form-input"
+                  value={newRoom.number}
+                  onChange={(e) => setNewRoom({ ...newRoom, number: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="form-label">Room Type</label>
+                <select
+                  className="form-input"
+                  value={newRoom.type}
+                  onChange={(e) => setNewRoom({ ...newRoom, type: e.target.value })}
+                >
+                  <option value="General Ward">General Ward</option>
+                  <option value="Semi-Private">Semi-Private</option>
+                  <option value="Private Suite">Private Suite</option>
+                  <option value="ICU">ICU</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label">Total Beds</label>
+                <input
+                  type="number"
+                  min="1"
+                  className="form-input"
+                  value={newRoom.beds}
+                  onChange={(e) => setNewRoom({ ...newRoom, beds: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                >
+                  Add Room
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
