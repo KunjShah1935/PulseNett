@@ -2,6 +2,42 @@ import React, { useState, useEffect } from 'react';
 import BASE from '../../config';
 import { Card, Table, SectionHeader, Badge } from '../../components/ui';
 
+/* ================= Sepsis Risk Lazy-Loading Badge ================= */
+export function PatientRiskBadge({ patientId }) {
+  const [latest, setLatest] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!patientId) return;
+    fetch(`${BASE}/api/ai/latest/${patientId}`)
+      .then(res => {
+        if (!res.ok) throw new Error("No risk recorded");
+        return res.json();
+      })
+      .then(data => {
+        setLatest(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLatest(null);
+        setLoading(false);
+      });
+  }, [patientId]);
+
+  if (loading) return <span className="text-xs text-slate-400">Loading...</span>;
+  if (!latest) return <span className="text-xs text-slate-400">No Vitals yet</span>;
+
+  const { risk, status } = latest;
+  const badgeVariant = status === "Normal" ? "green" : status === "Warning" ? "yellow" : "red";
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <Badge variant={badgeVariant}>{status}</Badge>
+      <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">{risk}%</span>
+    </div>
+  );
+}
+
 /* ================= Dashboard ================= */
 export function DoctorDashboard() {
   const [patients, setPatients] = useState([]);
@@ -20,13 +56,13 @@ export function DoctorDashboard() {
     <div>
       <SectionHeader title="Doctor Dashboard" subtitle={`Welcome, ${user.fullname}`} />
       <Card title="Recent Admissions">
-        <Table headers={['Patient ID', 'Room', 'Diagnosis', 'Status']}>
+        <Table headers={['Patient ID', 'Room', 'Diagnosis', 'Sepsis Risk']}>
           {patients?.slice(0, 5).filter(Boolean).map(p => (
-            <tr key={p?._id ?? Math.random()}>
-              <td className="font-mono text-xs">{p?.patientId ?? "N/A"}</td>
-              <td>{p?.roomNumber ?? "N/A"}</td>
-              <td className="text-sm">{p?.chiefComplaint ?? "N/A"}</td>
-              <td><Badge variant="green">Active</Badge></td>
+            <tr key={p?._id ?? Math.random()} className="hover:bg-slate-50 dark:hover:bg-slate-800/10 transition-colors">
+              <td className="table-cell font-mono text-xs">{p?.patientId ?? "N/A"}</td>
+              <td className="table-cell">{p?.roomNumber ?? "N/A"}</td>
+              <td className="table-cell text-sm">{p?.diagnosis || p?.chiefComplaint || "N/A"}</td>
+              <td className="table-cell"><PatientRiskBadge patientId={p?.patientId} /></td>
             </tr>
           ))}
         </Table>
@@ -53,13 +89,14 @@ export function DoctorPatients() {
     <div>
       <SectionHeader title="My Patients" subtitle={`Patients assigned to Dr. ${user.fullname}`} />
       <Card>
-        <Table headers={['ID', 'Room', 'Admission Date', 'Diagnosis']}>
+        <Table headers={['ID', 'Room', 'Admission Date', 'Diagnosis', 'Sepsis Risk']}>
           {patients?.filter(Boolean).map(p => (
-            <tr key={p?._id ?? Math.random()}>
-              <td className="font-mono text-xs">{p?.patientId ?? "N/A"}</td>
-              <td>{p?.roomNumber ?? "N/A"}</td>
-              <td className="text-xs">{p?.admissionDate ? new Date(p.admissionDate).toLocaleDateString() : "N/A"}</td>
-              <td className="text-sm">{p?.chiefComplaint ?? "N/A"}</td>
+            <tr key={p?._id ?? Math.random()} className="hover:bg-slate-50 dark:hover:bg-slate-800/10 transition-colors">
+              <td className="table-cell font-mono text-xs">{p?.patientId ?? "N/A"}</td>
+              <td className="table-cell">{p?.roomNumber ?? "N/A"}</td>
+              <td className="table-cell text-xs">{p?.admissionDate ? new Date(p.admissionDate).toLocaleDateString() : "N/A"}</td>
+              <td className="table-cell text-sm">{p?.diagnosis || p?.chiefComplaint || "N/A"}</td>
+              <td className="table-cell"><PatientRiskBadge patientId={p?.patientId} /></td>
             </tr>
           ))}
         </Table>
