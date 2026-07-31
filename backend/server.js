@@ -16,6 +16,7 @@ import activityLogRoutes from "./routes/activityLog.js";
 import inventoryRoutes from "./routes/inventory.js";
 import medicinePriceRoutes from "./routes/medicinePrice.js";
 import path from "path";
+import aiRoutes from "./routes/ai.js";
 // import paymentRoutes from "./routes/payment.js";
 
 
@@ -25,7 +26,7 @@ const app = express();
 
 // middleware
 app.use(cors({
-  origin: ["https://pulse-nett-lipa.vercel.app", /\.vercel\.app$/],
+  origin: ["https://pulse-nett-lipa.vercel.app", "http://localhost:5173", /\.vercel\.app$/],
   credentials: true
 }));
 app.use(express.json());
@@ -43,10 +44,6 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 
-app.use("/api", adminRoutes);
-app.use("/api", authRoutes);
-app.use("/api/auth", authRoutes);
-
 app.use("/api/patient", patientRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/bill", billRoutes);
@@ -58,7 +55,12 @@ app.use("/api/charges", chargeRoutes);
 app.use("/api/logs", activityLogRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/medicine-prices", medicinePriceRoutes);
+app.use("/api/ai", aiRoutes);
 // app.use("/api/payment", paymentRoutes);
+
+app.use("/api", adminRoutes);
+app.use("/api", authRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 console.log("AdmissionForm route loaded");
