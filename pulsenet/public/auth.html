@@ -1354,6 +1354,10 @@
 
         
 
+        const BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000"
+            : "https://pulsenett.onrender.com";
+
         async function handleSignup() {
             let valid = true;
 
@@ -1370,7 +1374,7 @@
             }
 
             try {
-                const res = await fetch("https://pulsenett.onrender.com/api/auth/signup", {
+                const res = await fetch(`${BASE_URL}/api/auth/signup`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -1413,7 +1417,7 @@
             }
 
             try {
-                const res = await fetch("https://pulsenett.onrender.com/api/auth/login", {
+                const res = await fetch(`${BASE_URL}/api/auth/login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
